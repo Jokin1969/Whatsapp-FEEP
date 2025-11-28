@@ -1,7 +1,4 @@
-// Configuración de SendBinder
-const SENDBINDER_API_KEY = 'YOUR_SENDBINDER_API_KEY'; // Reemplazar con la API key real
-const SENDBINDER_EMAIL = 'YOUR_EMAIL@example.com'; // Email destino
-
+// La configuración se carga desde config.js
 document.getElementById('feepForm').addEventListener('submit', async function(e) {
     e.preventDefault();
 
@@ -47,14 +44,14 @@ document.getElementById('feepForm').addEventListener('submit', async function(e)
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${SENDBINDER_API_KEY}`
+                'Authorization': `Bearer ${CONFIG.SENDBINDER_API_KEY}`
             },
             body: JSON.stringify({
-                to: SENDBINDER_EMAIL,
+                to: CONFIG.SENDBINDER_EMAIL,
                 from: 'noreply@feep.com',
                 subject: 'Nueva respuesta - Formulario FEEP',
                 html: emailBody,
-                replyTo: data.email || SENDBINDER_EMAIL
+                replyTo: data.email || CONFIG.SENDBINDER_EMAIL
             })
         });
 

@@ -1,0 +1,15 @@
+{
+  "name": "whatsapp-feep",
+  "version": "1.0.0",
+  "description": "Formulario web versátil para FEEP con integración de SendBinder",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx serve . -p ${PORT:-3000}"
+  },
+  "keywords": ["feep", "form", "sendbinder"],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "serve": "^14.2.0"
+  }
+}
