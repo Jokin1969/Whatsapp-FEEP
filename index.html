@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario FEEP</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header class="form-header">
+            <img src="public/assets/logo-feep.png" alt="Logo FEEP" class="logo">
+            <h1>Formulario FEEP</h1>
+            <p class="description">Por favor, complete el siguiente formulario.</p>
+        </header>
+
+        <form id="feepForm" class="feep-form">
+            <!-- Los campos se añadirán aquí según la información del formulario -->
+
+            <div class="form-group">
+                <label for="email">Correo electrónico <span class="required">*</span></label>
+                <input type="email" id="email" name="email" required>
+            </div>
+
+            <button type="submit" class="submit-btn">Enviar</button>
+        </form>
+
+        <div id="successMessage" class="success-message hidden">
+            <p>✓ Formulario enviado correctamente. Gracias por tu respuesta.</p>
+        </div>
+
+        <div id="errorMessage" class="error-message hidden">
+            <p>✗ Hubo un error al enviar el formulario. Por favor, inténtalo de nuevo.</p>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+</body>
+</html>
