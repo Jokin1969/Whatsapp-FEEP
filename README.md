@@ -9,16 +9,26 @@ Coloca el logo de FEEP en `public/assets/logo-feep.png`
 
 ### 2. API Key de SendBinder
 
+#### Obtener tu API Key:
+1. Ve a [SendBinder.com](https://sendbinder.com/)
+2. Crea una cuenta o inicia sesión
+3. En el dashboard, copia tu API key
+
+#### Configuración:
+
+**Para desarrollo local:**
+1. Copia el archivo de ejemplo:
+   ```bash
+   cp config.example.js config.js
+   ```
+2. Edita `config.js` y reemplaza `'TU_API_KEY_AQUI'` con tu API key real
+3. **IMPORTANTE:** `config.js` está en `.gitignore` - NO se subirá a git
+
 **Para Railway (Producción):**
 1. Ve al dashboard de tu proyecto en Railway
 2. Navega a la sección "Variables"
-3. Añade la siguiente variable de entorno:
-   - `SENDBINDER_API_KEY`: Tu clave API de SendBinder
-
-**Para desarrollo local:**
-1. Copia `.env.example` a `.env`
-2. Edita `.env` y añade tu API key
-3. Modifica `config.js` para cargar desde `.env` (o edita directamente `config.js`)
+3. Añade: `SENDBINDER_API_KEY` con tu clave API
+4. Railway reemplazará automáticamente los valores durante el despliegue
 
 El email destino ya está configurado: **castilla@joaquincastilla.com**
 
