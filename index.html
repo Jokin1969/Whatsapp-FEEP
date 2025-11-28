@@ -9,20 +9,101 @@
 <body>
     <div class="container">
         <header class="form-header">
-            <img src="public/assets/logo-feep.png" alt="Logo FEEP" class="logo">
-            <h1>Formulario FEEP</h1>
-            <p class="description">Por favor, complete el siguiente formulario.</p>
+            <h1>Grupo de WhatsApp (FEEP)</h1>
+            <p class="required-note">* Indica que la pregunta es obligatoria</p>
         </header>
 
+        <div class="intro-section">
+            <p>Este formulario se ha diseñado para aquellas personas que estén interesadas en entrar en el grupo de WhatsApp de la <a href="https://www.fundacionprionicas.org/" target="_blank" rel="noopener">Fundación Española de Enfermedades Priónicas</a></p>
+
+            <div class="logo-container">
+                <img src="public/assets/logo-feep.png" alt="Logo FEEP" class="logo">
+            </div>
+        </div>
+
+        <div class="objective-section">
+            <h2>Objetivo del grupo de WhatsApp de la Fundación Española de enfermedades priónicas</h2>
+            <p>El grupo de WhatsApp se creó con el objetivo de disponer de un medio rápido y eficaz para informar a todas aquellas personas interesadas en las enfermedades priónicas.</p>
+            <p>No se trata de un grupo para establecer conversaciones sino para mantenerse informado/a de aquello que, como afectado/a, podría interesarte conocer.</p>
+            <p>La frecuencia media de los mensajes suele ser de 1-4 mensajes semanales.</p>
+        </div>
+
         <form id="feepForm" class="feep-form">
-            <!-- Los campos se añadirán aquí según la información del formulario -->
+            <div class="form-group">
+                <label for="nombre">Nombre <span class="required">*</span></label>
+                <input type="text" id="nombre" name="nombre" required placeholder="Tu respuesta">
+            </div>
+
+            <div class="form-group">
+                <label for="apellidos">Apellidos (completos) <span class="required">*</span></label>
+                <input type="text" id="apellidos" name="apellidos" required placeholder="Tu respuesta">
+            </div>
+
+            <div class="form-group">
+                <label for="telefono">Teléfono móvil (aquel que se utilizará para el WhatsApp) <span class="required">*</span></label>
+                <input type="tel" id="telefono" name="telefono" required placeholder="Tu respuesta">
+            </div>
 
             <div class="form-group">
                 <label for="email">Correo electrónico <span class="required">*</span></label>
-                <input type="email" id="email" name="email" required>
+                <input type="email" id="email" name="email" required placeholder="Tu respuesta">
             </div>
 
-            <button type="submit" class="submit-btn">Enviar</button>
+            <div class="form-group">
+                <label for="contacto">¿Cómo y con qué persona de la Fundación ha contactado previamente? <span class="required">*</span></label>
+                <input type="text" id="contacto" name="contacto" required placeholder="Tu respuesta">
+            </div>
+
+            <div class="form-group">
+                <label>¿Con qué enfermedad priónica tiene relación? <span class="required">*</span></label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="enfermedad1" name="enfermedad" value="La enfermedad de Creutzfeldt-Jakob esporádica">
+                        <label for="enfermedad1">La enfermedad de Creutzfeldt-Jakob esporádica</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="enfermedad2" name="enfermedad" value="La enfermedad de Creutzfeldt-Jakob genética">
+                        <label for="enfermedad2">La enfermedad de Creutzfeldt-Jakob genética</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="enfermedad3" name="enfermedad" value="El insomnio familiar fatal">
+                        <label for="enfermedad3">El insomnio familiar fatal</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="enfermedad4" name="enfermedad" value="El síndrome de Gerstmann-Sträussler-Scheinker">
+                        <label for="enfermedad4">El síndrome de Gerstmann-Sträussler-Scheinker</label>
+                    </div>
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="enfermedad5" name="enfermedad" value="No lo sé exactamente">
+                        <label for="enfermedad5">No lo sé exactamente</label>
+                    </div>
+                    <div class="checkbox-option checkbox-with-text">
+                        <input type="checkbox" id="enfermedad6" name="enfermedad" value="otro">
+                        <label for="enfermedad6">Otro:</label>
+                        <input type="text" id="enfermedadOtra" name="enfermedadOtra" placeholder="" class="inline-text-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="data-protection-section">
+                <h3>Protección de datos de carácter personal</h3>
+                <p>En cumplimiento de lo establecido en la Ley Orgánica 15/1999, de 13 de diciembre, de Protección de Datos de Carácter Personal y su reglamento de desarrollo, la Fundación Española de Enfermedades Priónicas le informa que los datos de carácter personal que nos ha facilitado y aquellos que nos facilite en un futuro por cualquier medio, serán incorporados a nuestros ficheros para su tratamiento automatizado, con la finalidad de gestión, administración e información que tuviera lugar. Los datos recogidos son almacenados bajo la confidencialidad y las medidas de seguridad legalmente establecidas. Usted podrá ejercer los derechos de acceso, rectificación, cancelación y oposición mediante solicitud acompañada de fotocopia de su documento nacional de identidad, dirigida a la Fundación Española de enfermedades priónicas (<a href="tel:+34607999000">+34 607 999 000</a>; Avenida Lomas del Rey 70, 28701, San Sebastián de los Reyes, Madrid) o a través de correo electrónico a la dirección <a href="mailto:comunicacion@fundacionprionicas.org">comunicacion@fundacionprionicas.org</a>.</p>
+            </div>
+
+            <div class="form-group">
+                <label>Acepto <span class="required">*</span></label>
+                <div class="checkbox-group">
+                    <div class="checkbox-option">
+                        <input type="checkbox" id="aceptoProteccion" name="aceptoProteccion" required value="Acepto protección de datos">
+                        <label for="aceptoProteccion">Protección de datos (se detalla en el párrafo anterior)</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-actions">
+                <button type="submit" class="submit-btn">Enviar</button>
+                <button type="button" class="clear-btn" onclick="document.getElementById('feepForm').reset()">Borrar formulario</button>
+            </div>
         </form>
 
         <div id="successMessage" class="success-message hidden">

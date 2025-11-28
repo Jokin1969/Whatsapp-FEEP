@@ -1,6 +1,34 @@
 // La configuración se carga desde config.js
+
+// Validación personalizada para checkboxes de enfermedad
+function validarEnfermedades() {
+    const checkboxes = document.querySelectorAll('input[name="enfermedad"]');
+    const algunoSeleccionado = Array.from(checkboxes).some(cb => cb.checked);
+
+    if (!algunoSeleccionado) {
+        alert('Por favor, seleccione al menos una enfermedad priónica');
+        return false;
+    }
+    return true;
+}
+
+// Habilitar/deshabilitar campo "Otro" según checkbox
+document.getElementById('enfermedad6').addEventListener('change', function() {
+    const otroInput = document.getElementById('enfermedadOtra');
+    if (this.checked) {
+        otroInput.focus();
+    } else {
+        otroInput.value = '';
+    }
+});
+
 document.getElementById('feepForm').addEventListener('submit', async function(e) {
     e.preventDefault();
+
+    // Validar enfermedades
+    if (!validarEnfermedades()) {
+        return;
+    }
 
     const submitBtn = this.querySelector('.submit-btn');
     const successMessage = document.getElementById('successMessage');
@@ -17,27 +45,74 @@ document.getElementById('feepForm').addEventListener('submit', async function(e)
     try {
         // Recopilar datos del formulario
         const formData = new FormData(this);
-        const data = {};
 
-        for (let [key, value] of formData.entries()) {
-            if (data[key]) {
-                // Si ya existe, convertir a array
-                if (Array.isArray(data[key])) {
-                    data[key].push(value);
+        // Obtener valores específicos
+        const nombre = formData.get('nombre');
+        const apellidos = formData.get('apellidos');
+        const telefono = formData.get('telefono');
+        const email = formData.get('email');
+        const contacto = formData.get('contacto');
+
+        // Procesar enfermedades seleccionadas
+        const enfermedades = [];
+        const checkboxes = document.querySelectorAll('input[name="enfermedad"]:checked');
+        checkboxes.forEach(cb => {
+            if (cb.value === 'otro') {
+                const otroTexto = document.getElementById('enfermedadOtra').value.trim();
+                if (otroTexto) {
+                    enfermedades.push(`Otro: ${otroTexto}`);
                 } else {
-                    data[key] = [data[key], value];
+                    enfermedades.push('Otro');
                 }
             } else {
-                data[key] = value;
+                enfermedades.push(cb.value);
             }
-        }
+        });
 
-        // Preparar el contenido del email
-        let emailBody = '<h2>Nueva respuesta del Formulario FEEP</h2><br>';
-        for (let [key, value] of Object.entries(data)) {
-            const displayValue = Array.isArray(value) ? value.join(', ') : value;
-            emailBody += `<strong>${key}:</strong> ${displayValue}<br>`;
-        }
+        const aceptoProteccion = formData.get('aceptoProteccion') ? 'Sí' : 'No';
+
+        // Preparar el contenido del email en formato HTML estructurado
+        const emailBody = `
+            <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+                <h2 style="color: #673ab7; border-bottom: 3px solid #673ab7; padding-bottom: 10px;">
+                    Nueva solicitud - Grupo de WhatsApp (FEEP)
+                </h2>
+
+                <div style="background-color: #f8f9fa; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                    <h3 style="color: #202124; margin-top: 0;">Datos personales</h3>
+                    <p><strong>Nombre:</strong> ${nombre}</p>
+                    <p><strong>Apellidos:</strong> ${apellidos}</p>
+                    <p><strong>Teléfono móvil (WhatsApp):</strong> ${telefono}</p>
+                    <p><strong>Correo electrónico:</strong> ${email}</p>
+                </div>
+
+                <div style="background-color: #fff3e0; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                    <h3 style="color: #202124; margin-top: 0;">Información de contacto</h3>
+                    <p><strong>¿Cómo y con qué persona de la Fundación ha contactado previamente?</strong></p>
+                    <p>${contacto}</p>
+                </div>
+
+                <div style="background-color: #e8f5e9; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                    <h3 style="color: #202124; margin-top: 0;">Enfermedad(es) priónica(s)</h3>
+                    <ul style="margin: 10px 0; padding-left: 20px;">
+                        ${enfermedades.map(e => `<li>${e}</li>`).join('')}
+                    </ul>
+                </div>
+
+                <div style="background-color: #f1f3f4; padding: 20px; margin: 20px 0; border-radius: 8px;">
+                    <p><strong>Protección de datos:</strong> ${aceptoProteccion}</p>
+                </div>
+
+                <hr style="margin: 30px 0; border: none; border-top: 1px solid #dadce0;">
+
+                <p style="color: #5f6368; font-size: 12px;">
+                    Este formulario fue enviado el ${new Date().toLocaleString('es-ES', {
+                        dateStyle: 'full',
+                        timeStyle: 'short'
+                    })}
+                </p>
+            </div>
+        `;
 
         // Enviar email usando SendBinder
         const response = await fetch('https://api.sendbinder.com/v1/email', {
@@ -48,10 +123,10 @@ document.getElementById('feepForm').addEventListener('submit', async function(e)
             },
             body: JSON.stringify({
                 to: CONFIG.SENDBINDER_EMAIL,
-                from: 'noreply@feep.com',
-                subject: 'Nueva respuesta - Formulario FEEP',
+                from: 'noreply@fundacionprionicas.org',
+                subject: `Nueva solicitud WhatsApp FEEP - ${nombre} ${apellidos}`,
                 html: emailBody,
-                replyTo: data.email || CONFIG.SENDBINDER_EMAIL
+                replyTo: email
             })
         });
 
@@ -63,6 +138,8 @@ document.getElementById('feepForm').addEventListener('submit', async function(e)
             // Scroll al mensaje de éxito
             successMessage.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
         } else {
+            const errorData = await response.json();
+            console.error('Error response:', errorData);
             throw new Error('Error al enviar el email');
         }
 
@@ -78,18 +155,16 @@ document.getElementById('feepForm').addEventListener('submit', async function(e)
 });
 
 // Validación en tiempo real para campos requeridos
-document.querySelectorAll('input[required], textarea[required], select[required]').forEach(field => {
+document.querySelectorAll('input[required]:not([type="checkbox"])').forEach(field => {
     field.addEventListener('blur', function() {
         if (!this.value.trim()) {
-            this.style.borderColor = '#d93025';
-        } else {
-            this.style.borderColor = '#ddd';
+            this.style.borderBottomColor = '#d93025';
         }
     });
 
     field.addEventListener('input', function() {
         if (this.value.trim()) {
-            this.style.borderColor = '#ddd';
+            this.style.borderBottomColor = '#dadce0';
         }
     });
 });
