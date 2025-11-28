@@ -114,19 +114,24 @@ document.getElementById('feepForm').addEventListener('submit', async function(e)
             </div>
         `;
 
-        // Enviar email usando SendBinder
-        const response = await fetch('https://api.sendbinder.com/v1/email', {
+        // Enviar email usando SendGrid
+        const response = await fetch('https://api.sendgrid.com/v3/mail/send', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
-                'Authorization': `Bearer ${CONFIG.SENDBINDER_API_KEY}`
+                'Authorization': `Bearer ${CONFIG.SENDGRID_API_KEY}`
             },
             body: JSON.stringify({
-                to: CONFIG.SENDBINDER_EMAIL,
-                from: 'noreply@fundacionprionicas.org',
-                subject: `Nueva solicitud WhatsApp FEEP - ${nombre} ${apellidos}`,
-                html: emailBody,
-                replyTo: email
+                personalizations: [{
+                    to: [{ email: CONFIG.SENDGRID_TO_EMAIL }],
+                    subject: `Nueva solicitud WhatsApp FEEP - ${nombre} ${apellidos}`
+                }],
+                from: { email: CONFIG.SENDGRID_FROM_EMAIL },
+                reply_to: { email: email },
+                content: [{
+                    type: 'text/html',
+                    value: emailBody
+                }]
             })
         });
 

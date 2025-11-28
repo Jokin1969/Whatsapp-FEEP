@@ -6,7 +6,8 @@
 
 Antes de desplegar, asegúrate de tener:
 - [ ] Logo FEEP guardado en `public/assets/logo-feep.png`
-- [ ] API Key de SendBinder
+- [ ] API Key de SendGrid
+- [ ] Email remitente verificado en SendGrid
 - [ ] Cuenta de Railway activa
 
 ### 2. Configuración en Railway
@@ -20,11 +21,13 @@ Antes de desplegar, asegúrate de tener:
 
 2. **Configurar variables de entorno**
    - En el dashboard del proyecto, ve a la pestaña **"Variables"**
-   - Añade la siguiente variable:
+   - Añade las siguientes variables:
      ```
-     SENDBINDER_API_KEY=tu_api_key_aqui
+     SENDGRID_API_KEY=tu_api_key_aqui
+     SENDGRID_FROM_EMAIL=noreply@fundacionprionicas.org
+     SENDGRID_TO_EMAIL=castilla@joaquincastilla.com
      ```
-   - Nota: El email destino ya está configurado como `castilla@joaquincastilla.com`
+   - **IMPORTANTE**: El email `SENDGRID_FROM_EMAIL` debe estar verificado en SendGrid
 
 3. **Verificar configuración**
    - Railway detectará automáticamente el `package.json`
@@ -75,9 +78,10 @@ Si quieres usar un dominio propio:
 - Revisa los logs en Railway dashboard
 
 ### El email no llega
-- Verifica que la variable `SENDBINDER_API_KEY` esté configurada correctamente
+- Verifica que las variables `SENDGRID_API_KEY`, `SENDGRID_FROM_EMAIL` y `SENDGRID_TO_EMAIL` estén configuradas correctamente
 - Revisa los logs de Railway para ver errores de API
-- Verifica que la API key de SendBinder sea válida
+- Verifica que la API key de SendGrid sea válida
+- **IMPORTANTE**: Asegúrate de que el email `SENDGRID_FROM_EMAIL` esté verificado en SendGrid (Settings > Sender Authentication)
 
 ### El logo no se muestra
 - Asegúrate de que el archivo esté en `public/assets/logo-feep.png`
