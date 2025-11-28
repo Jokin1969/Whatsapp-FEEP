@@ -1,10 +1,13 @@
 // Cargar variables de entorno
-require('dotenv').config({ override: true });
+const path = require('path');
+require('dotenv').config({
+    path: path.join(__dirname, '.env'),
+    override: true
+});
 
 const express = require('express');
 const sgMail = require('@sendgrid/mail');
 const cors = require('cors');
-const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
