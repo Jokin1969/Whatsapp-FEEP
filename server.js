@@ -1,9 +1,23 @@
 // Cargar variables de entorno
 const path = require('path');
-require('dotenv').config({
+const dotenvResult = require('dotenv').config({
     path: path.join(__dirname, '.env'),
     override: true
 });
+
+// Debug: mostrar resultado de dotenv
+console.log('\n🔍 DEBUG - Dotenv resultado:');
+console.log('   Path:', path.join(__dirname, '.env'));
+console.log('   Error:', dotenvResult.error || 'ninguno');
+console.log('   Parsed:', dotenvResult.parsed ? 'OK' : 'FAIL');
+if (dotenvResult.parsed) {
+    console.log('   Variables cargadas:', Object.keys(dotenvResult.parsed).join(', '));
+}
+console.log('\n🔍 DEBUG - Variables en process.env:');
+console.log('   SENDGRID_API_KEY:', process.env.SENDGRID_API_KEY ? 'SET' : 'NOT SET');
+console.log('   SENDGRID_TO_EMAIL:', process.env.SENDGRID_TO_EMAIL || 'NOT SET');
+console.log('   SENDGRID_FROM_EMAIL:', process.env.SENDGRID_FROM_EMAIL || 'NOT SET');
+console.log();
 
 const express = require('express');
 const sgMail = require('@sendgrid/mail');
