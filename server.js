@@ -1,5 +1,5 @@
 // Cargar variables de entorno
-require('dotenv').config();
+require('dotenv').config({ override: true });
 
 const express = require('express');
 const sgMail = require('@sendgrid/mail');
