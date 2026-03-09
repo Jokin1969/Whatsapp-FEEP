@@ -1,33 +1,12 @@
-// Cargar variables de entorno
-const path = require('path');
-const dotenvResult = require('dotenv').config({
-    path: path.join(__dirname, '.env'),
-    override: true
-});
-
-// Debug: mostrar resultado de dotenv
-console.log('\n🔍 DEBUG - Dotenv resultado:');
-console.log('   Path:', path.join(__dirname, '.env'));
-console.log('   Error:', dotenvResult.error || 'ninguno');
-console.log('   Parsed:', dotenvResult.parsed ? 'OK' : 'FAIL');
-if (dotenvResult.parsed) {
-    console.log('   Variables cargadas:', Object.keys(dotenvResult.parsed).join(', '));
-}
-console.log('\n🔍 DEBUG - Variables en process.env:');
-console.log('   SENDGRID_API_KEY:', process.env.SENDGRID_API_KEY ? 'SET' : 'NOT SET');
-console.log('   SENDGRID_TO_EMAIL:', process.env.SENDGRID_TO_EMAIL || 'NOT SET');
-console.log('   SENDGRID_FROM_EMAIL:', process.env.SENDGRID_FROM_EMAIL || 'NOT SET');
-console.log();
+require('dotenv').config();
 
 const express = require('express');
-const sgMail = require('@sendgrid/mail');
+const nodemailer = require('nodemailer');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
-
-// Configurar SendGrid
-sgMail.setApiKey(process.env.SENDGRID_API_KEY);
 
 // Middleware
 app.use(cors());
@@ -36,6 +15,25 @@ app.use(express.urlencoded({ extended: true }));
 
 // Servir archivos estáticos desde el directorio raíz
 app.use(express.static(__dirname));
+
+// Crear transporter SMTP
+function createTransporter() {
+    const { SMTP_HOST, SMTP_PORT, SMTP_SECURE, SMTP_USER, SMTP_PASS } = process.env;
+
+    if (!SMTP_HOST || !SMTP_USER || !SMTP_PASS) {
+        return null;
+    }
+
+    return nodemailer.createTransport({
+        host: SMTP_HOST,
+        port: parseInt(SMTP_PORT || '587', 10),
+        secure: SMTP_SECURE === 'true',
+        auth: {
+            user: SMTP_USER,
+            pass: SMTP_PASS
+        }
+    });
+}
 
 // Endpoint para enviar email
 app.post('/api/send-email', async (req, res) => {
@@ -59,16 +57,16 @@ app.post('/api/send-email', async (req, res) => {
         }
 
         // Validar que las variables de entorno estén configuradas
-        if (!process.env.SENDGRID_API_KEY) {
-            console.error('ERROR: SENDGRID_API_KEY no está configurada');
+        if (!process.env.SMTP_HOST || !process.env.SMTP_USER || !process.env.SMTP_PASS) {
+            console.error('ERROR: Variables SMTP no configuradas');
             return res.status(500).json({
                 success: false,
                 error: 'Configuración del servidor incompleta'
             });
         }
 
-        if (!process.env.SENDGRID_TO_EMAIL || !process.env.SENDGRID_FROM_EMAIL) {
-            console.error('ERROR: SENDGRID_TO_EMAIL o SENDGRID_FROM_EMAIL no están configuradas');
+        if (!process.env.SMTP_TO_EMAIL) {
+            console.error('ERROR: SMTP_TO_EMAIL no está configurada');
             return res.status(500).json({
                 success: false,
                 error: 'Configuración del servidor incompleta'
@@ -118,17 +116,15 @@ app.post('/api/send-email', async (req, res) => {
             </div>
         `;
 
-        // Configurar el mensaje
-        const msg = {
-            to: process.env.SENDGRID_TO_EMAIL,
-            from: process.env.SENDGRID_FROM_EMAIL,
+        const transporter = createTransporter();
+
+        await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: process.env.SMTP_TO_EMAIL,
             replyTo: email,
             subject: `Nueva solicitud WhatsApp FEEP - ${nombre} ${apellidos}`,
             html: emailBody
-        };
-
-        // Enviar email
-        await sgMail.send(msg);
+        });
 
         console.log(`✓ Email enviado correctamente para: ${nombre} ${apellidos}`);
 
@@ -139,11 +135,6 @@ app.post('/api/send-email', async (req, res) => {
 
     } catch (error) {
         console.error('Error al enviar email:', error);
-
-        // Registrar detalles del error para debugging
-        if (error.response) {
-            console.error('SendGrid error response:', error.response.body);
-        }
 
         res.status(500).json({
             success: false,
@@ -158,9 +149,10 @@ app.get('/api/health', (req, res) => {
         status: 'ok',
         timestamp: new Date().toISOString(),
         environment: {
-            hasApiKey: !!process.env.SENDGRID_API_KEY,
-            hasToEmail: !!process.env.SENDGRID_TO_EMAIL,
-            hasFromEmail: !!process.env.SENDGRID_FROM_EMAIL
+            hasSmtpHost: !!process.env.SMTP_HOST,
+            hasSmtpUser: !!process.env.SMTP_USER,
+            hasSmtpPass: !!process.env.SMTP_PASS,
+            toEmail: process.env.SMTP_TO_EMAIL || 'not set'
         }
     });
 });
@@ -174,10 +166,11 @@ app.get('/', (req, res) => {
 app.listen(PORT, () => {
     console.log(`\n🚀 Servidor iniciado correctamente`);
     console.log(`📍 Escuchando en: http://localhost:${PORT}`);
-    console.log(`\n📧 Configuración SendGrid:`);
-    console.log(`   API Key: ${process.env.SENDGRID_API_KEY ? '✓ Configurada' : '✗ NO configurada'}`);
-    console.log(`   To Email: ${process.env.SENDGRID_TO_EMAIL || '✗ NO configurada'}`);
-    console.log(`   From Email: ${process.env.SENDGRID_FROM_EMAIL || '✗ NO configurada'}`);
+    console.log(`\n📧 Configuración SMTP:`);
+    console.log(`   Host: ${process.env.SMTP_HOST || '✗ NO configurado'}`);
+    console.log(`   User: ${process.env.SMTP_USER ? '✓ Configurado' : '✗ NO configurado'}`);
+    console.log(`   Pass: ${process.env.SMTP_PASS ? '✓ Configurada' : '✗ NO configurada'}`);
+    console.log(`   Email destino: ${process.env.SMTP_TO_EMAIL || '✗ NO configurado'}`);
     console.log(`\n💡 Endpoints disponibles:`);
     console.log(`   GET  /              → Formulario principal`);
     console.log(`   POST /api/send-email → Enviar email`);
