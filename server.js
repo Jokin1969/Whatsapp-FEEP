@@ -31,7 +31,13 @@ function createTransporter() {
         auth: {
             user: SMTP_USER,
             pass: SMTP_PASS
-        }
+        },
+        tls: {
+            rejectUnauthorized: false
+        },
+        connectionTimeout: 10000,
+        greetingTimeout: 10000,
+        socketTimeout: 30000
     });
 }
 
@@ -62,6 +68,9 @@ app.get('/test-email', async (req, res) => {
         res.status(500).json({ ok: false, step: 'send', error: error.message });
     }
 });
+
+// Alias por compatibilidad
+app.get('/test-mail', (req, res) => res.redirect('/test-email'));
 
 // Endpoint para enviar email
 app.post('/api/send-email', async (req, res) => {
