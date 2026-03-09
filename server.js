@@ -35,6 +35,34 @@ function createTransporter() {
     });
 }
 
+// Endpoint de prueba de email
+app.get('/test-email', async (req, res) => {
+    const transporter = createTransporter();
+
+    if (!transporter) {
+        return res.status(500).json({ ok: false, step: 'config', error: 'SMTP no configurado. Faltan SMTP_HOST, SMTP_USER o SMTP_PASS.' });
+    }
+
+    try {
+        await transporter.verify();
+    } catch (error) {
+        return res.status(500).json({ ok: false, step: 'connection', error: error.message });
+    }
+
+    try {
+        const info = await transporter.sendMail({
+            from: process.env.SMTP_USER,
+            to: process.env.SMTP_TO_EMAIL || process.env.SMTP_USER,
+            subject: 'Test email - Whatsapp FEEP',
+            html: '<p>Email de prueba enviado correctamente desde el servidor Whatsapp-FEEP.</p>'
+        });
+
+        res.json({ ok: true, message: 'Email de prueba enviado', messageId: info.messageId });
+    } catch (error) {
+        res.status(500).json({ ok: false, step: 'send', error: error.message });
+    }
+});
+
 // Endpoint para enviar email
 app.post('/api/send-email', async (req, res) => {
     try {
